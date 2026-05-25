@@ -1,0 +1,46 @@
+name: Sync upstream and deploy
+
+on:
+  schedule:
+    # Check for upstream updates every 6 hours
+    - cron: "0 */6 * * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/InchStudio/forward-widget-hub.git
+          git fetch upstream
+
+      - name: Check for upstream changes
+        id: check
+        run: |
+          UPSTREAM_SHA=$(git rev-parse upstream/main)
+          LOCAL_SHA=$(git rev-parse HEAD)
+          echo "upstream_sha=$UPSTREAM_SHA" >> "$GITHUB_OUTPUT"
+          echo "local_sha=$LOCAL_SHA" >> "$GITHUB_OUTPUT"
+          if [ "$UPSTREAM_SHA" != "$LOCAL_SHA" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "New commits detected upstream!"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Already up to date."
+          fi
+
+      - name: Merge upstream changes
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "Auto Sync"
+          git config user.email "sync@users.noreply.github.com"
+          git merge upstream/main --no-edit --allow-unrelated-histories
+          git push origin main
+          echo "Merged and pushed upstream changes!"
