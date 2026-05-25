@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "if [ \"$_OPENNEXT\" = '1' ]; then next build; else _OPENNEXT=1 npx @opennextjs/cloudflare build; fi",
-    "build:cf": "_OPENNEXT=1 npx @opennextjs/cloudflare build && sed -i.bak 's/^import \\* as process from .node:process./import process from \"node:process\";/' .open-next/middleware/handler.mjs && rm -f .open-next/middleware/handler.mjs.bak && sort -u .open-next/cloudflare/next-env.mjs > .open-next/cloudflare/next-env.mjs.tmp && mv .open-next/cloudflare/next-env.mjs.tmp .open-next/cloudflare/next-env.mjs",
+    "build": "node -e \"if(process.env._OPENNEXT==='1'){require('child_process').execSync('npx next build --webpack',{stdio:'inherit',shell:true})}else{process.env._OPENNEXT='1';require('child_process').execSync('npx @opennextjs/cloudflare build',{stdio:'inherit',shell:true})}\"",
+    "build:cf": "node -e \"process.env._OPENNEXT='1';require('child_process').execSync('npx @opennextjs/cloudflare build',{stdio:'inherit',shell:true});\" && node -e \"const fs=require('fs');let c=fs.readFileSync('.open-next/middleware/handler.mjs','utf8');c=c.replace(/^import \\* as process from [\\\"']node:process[\\\"'];/gm,'import process from \\\"node:process\\\";');fs.writeFileSync('.open-next/middleware/handler.mjs',c);let e=fs.readFileSync('.open-next/cloudflare/next-env.mjs','utf8');let lines=[...new Set(e.split('\\n').filter(l=>l.trim()))];fs.writeFileSync('.open-next/cloudflare/next-env.mjs',lines.join('\\n'));\"",
     "build:docker": "next build",
     "start": "next start",
     "lint": "eslint",
