@@ -21,10 +21,10 @@ function isAlreadyExistsError(e: unknown): boolean {
 }
 
 async function ensureSchema(d1: D1Database): Promise<void> {
-  // Split schema into individual statements — D1 exec may not handle multi-statement strings
+  // Split schema into individual statements, collapse newlines for D1 exec
   const statements = SCHEMA
     .split(";")
-    .map((s) => s.trim())
+    .map((s) => s.trim().replace(/\n\s*/g, " "))
     .filter((s) => s.length > 0);
   for (const sql of statements) {
     try { await d1.exec(sql + ";"); } catch (e) {
