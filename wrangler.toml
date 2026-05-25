@@ -1,7 +1,7 @@
 name = "forward-widget-hub"
 main = ".open-next/worker.js"
-compatibility_date = "2024-12-01"
-compatibility_flags = ["nodejs_compat"]
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat_v2"]
 
 [assets]
 directory = ".open-next/assets"
@@ -9,7 +9,7 @@ directory = ".open-next/assets"
 [[d1_databases]]
 binding = "DB"
 database_name = "forward-widget-hub-db"
-database_id = "c3a81a93316440b923eba7812b19ef08"
+database_id = "b70b0f1e-fdc9-4d0a-b37c-a8ae66de7831"
 
 [[r2_buckets]]
 binding = "STORAGE"
